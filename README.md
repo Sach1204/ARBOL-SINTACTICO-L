@@ -45,14 +45,6 @@ Esta gramática asegura que:
 ```bash
 pip install networkx matplotlib
 ```
-
-### Clonar y ejecutar
-
-```bash
-# Descargar el archivo
-python Arbol.py
-```
-
 ## Uso
 
 Ejecuta el programa y ingresa expresiones matemáticas:
