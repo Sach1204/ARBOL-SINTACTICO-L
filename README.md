@@ -75,7 +75,51 @@ Para cada expresión válida, el programa:
 def tokenize(expr):
     tokens = []
     i = 0
-    # ... procesamiento carácter por carácter
+    while i < len(expr):
+        c = expr[i]
+
+        if c.isdigit():  # número
+            num = c
+            i += 1
+            while i < len(expr) and expr[i].isdigit():
+                num += expr[i]
+                i += 1
+            tokens.append(("num", num))
+            continue
+
+        elif c.isalpha():  # identificador
+            ident = c
+            i += 1
+            while i < len(expr) and (expr[i].isalnum() or expr[i] == "_"):
+                ident += expr[i]
+                i += 1
+            tokens.append(("id", ident))
+            continue
+
+        elif c in "+-":
+            tokens.append(("opsuma", c))
+
+        elif c in "*/":
+            tokens.append(("opmul", c))
+
+        elif c == "(":
+            tokens.append(("pari", c))
+
+        elif c == ")":
+            tokens.append(("pard", c))
+
+        elif c.isspace():
+            i += 1
+            continue
+
+        else:
+            raise ValueError(f"Carácter inesperado: {c}")
+
+        i += 1
+
+    tokens.append(("EOF", ""))
+    return tokens
+
 ```
 
 **Función**: Convierte una cadena de texto en una lista de tokens (unidades léxicas).
