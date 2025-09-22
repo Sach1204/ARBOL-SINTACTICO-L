@@ -1,0 +1,4 @@
+E -> E opsuma T | T
+T -> T opmul F | F
+F -> id | num | pari E pard
+
