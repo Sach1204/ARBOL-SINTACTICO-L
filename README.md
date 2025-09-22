@@ -91,8 +91,8 @@ def tokenize(expr):
 
 **Ejemplo**:
 ```python
-tokenize("2+a*3") 
-# Resultado: [("num","2"), ("opsuma","+"), ("id","a"), ("opmul","*"), ("num","3"), ("EOF","")]
+tokenize("2+3*4") 
+# Resultado: [("num","2"), ("opsuma","+"), ("id","3"), ("opmul","*"), ("num","4"), ("EOF","")]
 ```
 
 ### 2. **Clase Parser**
@@ -101,9 +101,25 @@ tokenize("2+a*3")
 class Parser:
     def __init__(self, tokens):
         self.tokens = tokens
-        self.pos = 0           # posición actual en la lista de tokens
-        self.graph = nx.DiGraph()  # grafo dirigido para el árbol
-        self.node_id = 0       # contador para IDs únicos de nodos
+        self.pos = 0
+        self.graph = nx.DiGraph()
+        self.node_id = 0
+
+    def current_token(self):
+        return self.tokens[self.pos]
+
+    def eat(self, token_type):
+        tok_type, tok_val = self.current_token()
+        if tok_type == token_type:
+            self.pos += 1
+            return tok_val
+        raise SyntaxError(f"Se esperaba {token_type} pero se encontró {tok_type}")
+
+    def new_node(self, label):
+        node = f"{label}_{self.node_id}"
+        self.graph.add_node(node, label=label)
+        self.node_id += 1
+        return node
 ```
 
 **Métodos auxiliares**:
@@ -115,51 +131,72 @@ class Parser:
 
 #### `parse_E()` - Expresiones
 ```python
-def parse_E(self):
-    # E -> E opsuma T | T
-    parent = self.new_node("E")
-    left = self.parse_T()      # primer término
-    self.graph.add_edge(parent, left)
-    
-    while self.current_token()[0] == "opsuma":  # mientras haya + o -
-        op = self.eat("opsuma")
-        op_node = self.new_node(op)
-        self.graph.add_edge(parent, op_node)
-        right = self.parse_T()  # siguiente término
-        self.graph.add_edge(parent, right)
-    
-    return parent
+ def parse_E(self):
+        parent = self.new_node("E")
+        left = self.parse_T()
+        self.graph.add_edge(parent, left)
+        while self.current_token()[0] == "opsuma":
+            op = self.eat("opsuma")
+            op_node = self.new_node(op)
+            self.graph.add_edge(parent, op_node)
+            right = self.parse_T()
+            self.graph.add_edge(parent, right)
+        return parent
 ```
 
 **Maneja**: Suma y resta (menor precedencia)
 
 #### `parse_T()` - Términos
 ```python
-def parse_T(self):
-    # T -> T opmul F | F
-    # Similar a parse_E() pero para multiplicación/división
+   def parse_T(self):
+        parent = self.new_node("T")
+        left = self.parse_F()
+        self.graph.add_edge(parent, left)
+        while self.current_token()[0] == "opmul":
+            op = self.eat("opmul")
+            op_node = self.new_node(op)
+            self.graph.add_edge(parent, op_node)
+            right = self.parse_F()
+            self.graph.add_edge(parent, right)
+        return parent
+
 ```
 
 **Maneja**: Multiplicación y división (mayor precedencia)
 
 #### `parse_F()` - Factores
 ```python
-def parse_F(self):
-    # F -> id | num | (E)
-    parent = self.new_node("F")
-    tok_type, _ = self.current_token()
-    
-    if tok_type == "num":        # número
-        val = self.eat("num")
-        leaf = self.new_node(val)
-        self.graph.add_edge(parent, leaf)
-    elif tok_type == "id":       # identificador
-        val = self.eat("id")
-        leaf = self.new_node(val)
-        self.graph.add_edge(parent, leaf)
-    elif tok_type == "pari":     # expresión entre paréntesis
-        self.eat("pari")
-        # ... manejo de paréntesis
+ def parse_F(self):
+        parent = self.new_node("F")
+        tok_type, _ = self.current_token()
+        if tok_type == "num":
+            val = self.eat("num")
+            leaf = self.new_node(val)
+            self.graph.add_edge(parent, leaf)
+            return parent
+        elif tok_type == "id":
+            val = self.eat("id")
+            leaf = self.new_node(val)
+            self.graph.add_edge(parent, leaf)
+            return parent
+        elif tok_type == "pari":
+            self.eat("pari")
+            p_node = self.new_node("(")
+            self.graph.add_edge(parent, p_node)
+            e_node = self.parse_E()
+            self.graph.add_edge(parent, e_node)
+            self.eat("pard")
+            p_node2 = self.new_node(")")
+            self.graph.add_edge(parent, p_node2)
+            return parent
+        else:
+            raise SyntaxError(f"Token inesperado: {tok_type}")
+
+    def parse(self):
+        root = self.parse_E()
+        if self.current_token()[0] != "EOF":
+            raise SyntaxError("Tokens restantes sin usar")
+        return root, self.graph
 ```
 
 **Maneja**: Elementos básicos (números, variables, expresiones entre paréntesis)
@@ -168,9 +205,25 @@ def parse_F(self):
 
 #### `hierarchy_pos()` - Cálculo de posiciones
 ```python
-def hierarchy_pos(G, root, width=1.0, vert_gap=0.3, ...):
-    # Calcula posiciones jerárquicas para los nodos
-    # Distribuye los hijos horizontalmente bajo cada padre
+def hierarchy_pos(G, root, width=1.0, vert_gap=0.3, vert_loc=0, xcenter=0.5, pos=None, parent=None):
+    if pos is None:
+        pos = {root: (xcenter, vert_loc)}
+    else:
+        pos[root] = (xcenter, vert_loc)
+
+    children = list(G.successors(root))
+    if len(children) != 0:
+        dx = width / len(children)
+        nextx = xcenter - width / 2 - dx / 2
+        for child in children:
+            nextx += dx
+            pos = hierarchy_pos(
+                G, child, width=dx, vert_gap=vert_gap,
+                vert_loc=vert_loc - vert_gap, xcenter=nextx,
+                pos=pos, parent=root,
+            )
+    return pos
+
 ```
 
 **Función**: Organiza los nodos en una estructura de árbol jerárquico.
@@ -178,13 +231,24 @@ def hierarchy_pos(G, root, width=1.0, vert_gap=0.3, ...):
 #### `draw_tree()` - Dibujo del árbol
 ```python
 def draw_tree(graph, root):
-    pos = hierarchy_pos(graph, root)  # calcular posiciones
-    labels = nx.get_node_attributes(graph, "label")  # obtener etiquetas
-    
+    pos = hierarchy_pos(graph, root)
+    labels = nx.get_node_attributes(graph, "label")
+
     plt.figure(figsize=(10, 7))
-    nx.draw(graph, pos, with_labels=True, labels=labels, ...)
-    plt.savefig("arbol_sintactico.png")
+    nx.draw(
+        graph,
+        pos,
+        with_labels=True,
+        labels=labels,
+        node_size=1200,
+        node_color="lightblue",
+        font_size=10,
+        font_weight="bold",
+        arrows=True,
+    )
+    plt.savefig("arbol_sintactico.png", bbox_inches="tight")
     plt.show()
+    print("Arbol sintáctico guardado como 'arbol_sintactico.png'")
 ```
 
 **Función**: Genera la visualización gráfica del árbol sintáctico.
