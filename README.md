@@ -205,6 +205,12 @@ def draw_tree(graph, root):
   |   |     |
   2   3     4
 ```
+**Como se ve en terminal**
+<img width="1018" height="148" alt="image" src="https://github.com/user-attachments/assets/5c6e4a00-467b-498a-b745-94b9ca5eda2b" />
+
+**Como se ve al ser creado**
+<img width="1018" height="774" alt="image" src="https://github.com/user-attachments/assets/0175e514-ad97-4d63-ae09-013a9b13b1f4" />
+
 
 ### Ejemplo 2: `(a+b)*c`
 
@@ -226,3 +232,9 @@ F   F
 |   |
 a   b
 ```
+**Como se ve en terminal**
+<img width="1018" height="95" alt="image" src="https://github.com/user-attachments/assets/934e1c20-99b5-4f5c-8d06-138a9c253250" />
+
+
+**Como se ve al ser creado**
+<img width="1018" height="792" alt="image" src="https://github.com/user-attachments/assets/d6730b6d-e0c5-49df-a44d-8b6b6aa6b6c5" />
