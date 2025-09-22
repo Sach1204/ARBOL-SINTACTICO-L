@@ -50,7 +50,7 @@ pip install networkx matplotlib
 Ejecuta el programa y ingresa expresiones matemáticas:
 
 ```bash
-python Arbol.py
+python3 Arbol.py
 ```
 
 ```
