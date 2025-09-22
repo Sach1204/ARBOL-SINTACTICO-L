@@ -1,4 +1,4 @@
-# ARBOL-SINTACTICO-L
+# ARBOL-SINTACTICO
 # 🌳 Analizador Sintáctico con Árbol de Gramática
 
 Este proyecto implementa un **analizador sintáctico (parser)** que genera y visualiza árboles sintácticos para expresiones matemáticas. El programa incluye un tokenizador manual, un parser recursivo descendente y un sistema de visualización usando NetworkX y Matplotlib.
