@@ -50,7 +50,7 @@ pip install networkx matplotlib
 
 ```bash
 # Descargar el archivo
-python arbol_sintactico.py
+python Arbol.py
 ```
 
 ## Uso
@@ -58,7 +58,7 @@ python arbol_sintactico.py
 Ejecuta el programa y ingresa expresiones matemáticas:
 
 ```bash
-python arbol_sintactico.py
+python Arbol.py
 ```
 
 ```
