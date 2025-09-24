@@ -311,9 +311,9 @@ def draw_tree(graph, root):
 <img width="1018" height="774" alt="image" src="https://github.com/user-attachments/assets/0175e514-ad97-4d63-ae09-013a9b13b1f4" />
 
 
-### Ejemplo 2: `(a+b)*c`
+### Ejemplo 2: `(a+b)*3`
 
-**Tokens**: `[("pari","("), ("id","a"), ("opsuma","+"), ("id","b"), ("pard",")"), ("opmul","*"), ("id","c"), ("EOF","")]`
+**Tokens**: `[("pari","("), ("id","a"), ("opsuma","+"), ("id","b"), ("pard",")"), ("opmul","*"), ("id","3"), ("EOF","")]`
 
 **Árbol resultante**:
 ```
@@ -323,7 +323,7 @@ def draw_tree(graph, root):
    / | | \
   F  *  F
  /|\    |
-( E )   c
+( E )   3
  /|\
 T + T
 |   |
