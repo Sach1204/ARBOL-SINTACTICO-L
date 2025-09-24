@@ -3,15 +3,6 @@
 
 Este proyecto implementa un **analizador sintáctico (parser)** que genera y visualiza árboles sintácticos para expresiones matemáticas. El programa incluye un tokenizador manual, un parser recursivo descendente y un sistema de visualización usando NetworkX y Matplotlib.
 
-## Características
-
-- **Tokenizador manual** que reconoce números, identificadores, operadores y paréntesis
-- **Parser recursivo descendente** que construye árboles sintácticos
-- **Visualización gráfica** de los árboles generados
-- **Manejo de precedencia** de operadores (multiplicación antes que suma)
-- **Soporte para paréntesis** para modificar la precedencia
-- **Interfaz interactiva** de línea de comandos
-
 ## Gramática Soportada
 
 El analizador implementa la siguiente gramática libre de contexto:
